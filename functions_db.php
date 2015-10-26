@@ -93,13 +93,13 @@
 		// if exists retun user id
 		if(count($row) > 0)
 		{
-			return $row["id"];
+			return $row["id_user"];
 		}
 		else
 			return '';
 	}
 
-	function user_details($id){
+	function user_details($id_user){
 		// connect to db
 		try 
 		{
@@ -113,8 +113,8 @@
 		    echo "Cannot establish connection to database!!!"; 
 		}
 
-		$stmt = $db->prepare("SELECT * FROM users_table WHERE id=? ");
-		$stmt->bindValue(1, $id, PDO::PARAM_INT);
+		$stmt = $db->prepare("SELECT * FROM users_table WHERE id_user=? ");
+		$stmt->bindValue(1, $id_user, PDO::PARAM_INT);
 		$stmt->execute();
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
 		// return results
@@ -226,7 +226,7 @@
 		$sth->bindParam(1, $content, PDO::PARAM_STR);
 		$sth->execute();
 
-		$lastId = $db->lastInsertId('id');
+		$lastId = $db->lastInsertId('id_user');
 		$sql = "INSERT INTO posts (id_user, id_post) VALUES (?, ?);";
 		$sth = $db->prepare($sql);
 		$sth->bindParam(1, $id_user, PDO::PARAM_INT);
@@ -235,7 +235,7 @@
 		return true;
 	}
 
-		function get_posts($id_user){
+		function get_posts(){
 		// connect to db
 		try 
 		{
@@ -249,12 +249,67 @@
 		{
 		    echo "Cannot establish connection to database!!!"; 
 		}
-		// get user email
-		$stmt = $db->prepare("SELECT * FROM view_posts WHERE id_user=? ORDER BY id_post DESC");
-		$stmt->bindValue(1, $id_user, PDO::PARAM_STR);
+		// get all posts
+		$stmt = $db->prepare("SELECT * FROM view_posts_usr ORDER BY id_post DESC");
 		$stmt->execute();
-		$rows = $stmt->fetchAll(PDO::FETCH_COLUMN, 1);
+		// $rows = $stmt->fetchAll(PDO::FETCH_COLUMN, 1);
+		$rows = $stmt->fetchAll();
 		return $rows;
 
 	}
+
+	function add_comment($id_user_comment, $id_post, $comment){
+		// connect to db
+		try 
+		{
+			$host 	= 'localhost';
+			$dbname = 'social_networking';
+			$user 	= 'cicy';
+			$pass 	= 'cicy';
+		    $db = new PDO('mysql:host=' .$host. ';dbname=' .$dbname.';charset=utf8', $user, $pass);
+		} 
+		catch(PDOException $ex) 
+		{
+		    echo "Cannot establish connection to database!!!"; 
+		}
+
+		$sql = "INSERT INTO comment (id_comment_user, content) VALUES (?, ?);";
+		$sth = $db->prepare($sql);
+		$sth->bindParam(1, $id_user_comment, PDO::PARAM_INT);
+		$sth->bindParam(2, $comment, PDO::PARAM_STR);
+		$sth->execute();
+
+		$lastId = $db->lastInsertId('id_comment');
+		$sql = "INSERT INTO comments (id_comment, id_post) VALUES (?, ?);";
+		$sth = $db->prepare($sql);
+		$sth->bindParam(1, $lastId, PDO::PARAM_INT);
+		$sth->bindParam(2, $id_post, PDO::PARAM_INT);
+		$sth->execute();
+		return true;
+	}
+
+		function get_comments($id_post){
+		// connect to db
+		try 
+		{
+			$host 	= 'localhost';
+			$dbname = 'social_networking';
+			$user 	= 'cicy';
+			$pass 	= 'cicy';
+		    $db = new PDO('mysql:host=' .$host. ';dbname=' .$dbname.';charset=utf8', $user, $pass);
+		} 
+		catch(PDOException $ex) 
+		{
+		    echo "Cannot establish connection to database!!!"; 
+		}
+		// get all posts
+		$stmt = $db->prepare("SELECT * FROM view_comments WHERE id_post=?");
+		$stmt->bindValue(1, $id_post, PDO::PARAM_INT);
+		$stmt->execute();
+		// $rows = $stmt->fetchAll(PDO::FETCH_COLUMN, 1);
+		$rows = $stmt->fetchAll();
+		return $rows;
+
+	}
+
 ?>

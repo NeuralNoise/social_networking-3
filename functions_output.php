@@ -14,6 +14,12 @@
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <!-- validation script - comments -->
+  <script type="text/javascript">
+    function emptyComment(){
+      alert("Comment cannot be empty");
+    }
+  </script>
   <!-- Custom styles for this project -->
   <link href="css/style.css" rel="stylesheet">
 </head>
@@ -345,28 +351,121 @@ if(!$success){
       <button id="submit" name="submit" type="submit" class="btn btn-default">Add</button>
     </form>
   </div>
-      <!-- display posts -->
+
+<?php 
+      do_html_published_posts($id_user);
+  }
+    // end of comments
+
+  function do_html_published_posts($id_user_current)
+  {
+  // function displays all posts
+?>
+
   <div class="container">
     <h2>Published posts</h2>
     <div class="panel-group">
 <?php 
-      $posts = get_posts($id_user);
-      foreach($posts as $line){
-?>
-      <div class="panel panel-info">
-        <div class="panel-heading"><?php echo $line; ?></div>
-        <div class="panel-body">Comment</div>
-      </div>
-<?php
 
+      // used to load a section position on the page 
+      $counter      = 1;
+
+      // get all posts from db
+      $posts = get_posts();
+      foreach($posts as $line){
+        // different heading color for current and other users
+        $panel_type = 'info';
+
+        // split array into variables
+        $username     = $line["username"];
+        $content      = $line["content"];
+        $id_user_post = $line["id_user"];
+        $id_post      = $line["id_post"];
+
+        // change heading color if post belongs to current user
+        if($id_user_post == $id_user_current)
+          $panel_type = 'success';
+
+        // echo 'id_user_post: ', $id_user_post, ' ';
+        // echo 'id_post: ', $id_post, ' ';
+?>
+      <div id="section-<?php echo $counter; ?>" class="panel panel-<?php echo $panel_type; ?>">
+        
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-sm-2"><b><?php echo $username; ?>:</b></div>
+            <div class="col-sm-10"><?php echo $content; ?></div>
+          </div>
+        </div>
+
+                <div class="panel-body">
+          <h7><em>Comments:</em></h7>
+
+<?php
+        // get all comments for individual post from db
+        $comments = get_comments($id_post);
+        foreach ($comments as $line2) {
+        
+        // split array into variables
+        $username = $line2["username"];
+        $comment  = $line2["content"];
+
+?>
+
+          <div class="row">
+            <div class="col-sm-2"><b><?php echo $username; ?>:</b></div>
+            <div class="col-sm-10"><?php echo $comment; ?></div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-10"><b><em>likes:7</em></b></div>
+          </div>
+<?php
+          }
+
+?>
+          &nbsp;
+          <form role="form" action="index.php#section-<?php echo $counter; ?>" method="post">
+            <div class="form-group">
+              <input type="text" class="form-control" id="comment<?php echo $counter; ?>" name="comment" placeholder="Enter your comment here">
+            </div>
+            <?php echo "<p class='text-danger'>$errComment</p>";?>
+            <input type="hidden" id="id_user_comment" name="id_post" value="<?php echo $id_post; ?>" /> 
+            <button id="submit_comment" name="submit_comment" type="submit" class="btn btn-default">Add comment</button>
+          </form>    
+        </div><!-- panel-body -->
+      </div><!-- panel panel-info/panel-success -->
+<?php
+      $counter++;
       }
 
 ?>
     </div>
   </div>
-<?php 
+
+<?php
   }
-    // end of comments
+  //end of function "do_html_published posts"///////////////////////////////////////
+
+  function add_comment_form($id_user_comment, $id_post)
+  {
+  // function closes html code
+?>
+
+    &nbsp;
+    <form role="form" action="index.php?id_user_comment=<?php echo $id_user_comment; ?>&id_post=<?php echo $id_post; ?>" method="post">
+      <div class="form-group">
+        <input type="text" class="form-control" id="comment" name="comment" placeholder="Enter your comment here">
+      </div>
+      <?php echo "<p class='text-danger'>$errComment</p>";?>
+      <button id="comment" name="comment" type="submit" class="btn btn-default">Add comment</button>
+
+
+
+<?php
+  }
+  //end of function "do_html_footer"///////////////////////////////////////
 
   function do_html_footer()
   {

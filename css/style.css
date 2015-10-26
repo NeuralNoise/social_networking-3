@@ -16,3 +16,8 @@ body {
 .container .text-muted {
   margin: 15px 0;
 }
+.spacer {  
+  margin-top: 40px; 
+  margin-left: 50px;
+  padding-top: 50px;
+}
