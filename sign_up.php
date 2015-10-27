@@ -63,7 +63,7 @@
 			// check if login and/or email is not already registered then add to db
 			if(add_user_to_db($login, $name, $surname, $age, $phone, $email, $pwd)){
 				// redirect and pass name (Get)
-				header('Location: /registration_complete.php?name='.$name);
+				header('Location: ./registration_complete.php?name='.$name);
 				die();
 			}
 			else

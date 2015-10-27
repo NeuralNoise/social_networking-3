@@ -35,7 +35,7 @@
 				$_SESSION['username'] = $details['username'];
 
 				// redirect and pass user id using GET
-				header('Location: /profile.php?id='.$id);
+				header('Location: ./profile.php?id='.$id);
 				die();
 			}
 			else

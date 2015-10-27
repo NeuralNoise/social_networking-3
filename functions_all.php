@@ -358,6 +358,9 @@ if(!$success){
 
       // get all posts from db
       $posts = get_posts();
+      if(count($posts) == 0)
+        echo '<p>No posts yet!</p>';
+
       foreach($posts as $line){
         // different heading color for current and other users
         $panel_type = 'info';
