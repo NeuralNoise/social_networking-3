@@ -1,20 +1,4 @@
 <?php
-	// function checks database connection
-	function connect_db()
-	{
-		try 
-		{
-			$host 	= '127.0.0.1';
-			$dbname = 'social_networking';
-			$user 	= 'root';
-			$pass 	= 'cicy';
-		    $db = new PDO('mysql:host=localhost;dbname=social_networking;charset=utf8', $user, $pass);
-		} catch(PDOException $ex) 
-		{
-		    echo "Cannot establish connection to database!!!"; 
-		}
-		echo "Connection established";
-	}
 
 	function add_user_to_db($username, $name, $surname, $age, $tel, $email, $password){
 		// connect to db
@@ -59,20 +43,7 @@
 	}
 
 	function login_user($username, $pwd){
-		// connect to db	function reset_password($key, $password){
-		// connect to db
-		try 
-		{
-			$host 	= 'localhost';
-			$dbname = 'social_networking';
-			$user 	= 'cicy';
-			$pass 	= 'cicy';
-		    $db = new PDO('mysql:host=' .$host. ';dbname=' .$dbname.';charset=utf8', $user, $pass);
-		} 
-		catch(PDOException $ex) 
-		{
-		    echo "Cannot establish connection to database!!!"; 
-		}
+		// connect to db	
 		try 
 		{
 			$host 	= 'localhost';
@@ -201,7 +172,7 @@
 			return true;
 		}
 		else{
-			echo "\ninside else db", $key;
+			//echo "\ninside else db", $key;
 			return false;
 		}
 	}
@@ -252,7 +223,6 @@
 		// get all posts
 		$stmt = $db->prepare("SELECT * FROM view_posts_usr ORDER BY id_post DESC");
 		$stmt->execute();
-		// $rows = $stmt->fetchAll(PDO::FETCH_COLUMN, 1);
 		$rows = $stmt->fetchAll();
 		return $rows;
 
@@ -306,9 +276,83 @@
 		$stmt = $db->prepare("SELECT * FROM view_comments WHERE id_post=?");
 		$stmt->bindValue(1, $id_post, PDO::PARAM_INT);
 		$stmt->execute();
-		// $rows = $stmt->fetchAll(PDO::FETCH_COLUMN, 1);
 		$rows = $stmt->fetchAll();
 		return $rows;
+
+	}
+
+		function add_like_post($id_user, $id_post){
+		// connect to db
+		try 
+		{
+			$host 	= 'localhost';
+			$dbname = 'social_networking';
+			$user 	= 'cicy';
+			$pass 	= 'cicy';
+		    $db = new PDO('mysql:host=' .$host. ';dbname=' .$dbname.';charset=utf8', $user, $pass);
+		} 
+		catch(PDOException $ex) 
+		{
+		    echo "Cannot establish connection to database!!!"; 
+		}
+
+		$sql = "INSERT INTO likes_post (id_user, id_post) VALUES (?, ?);";
+		$sth = $db->prepare($sql);
+		$sth->bindParam(1, $id_user, PDO::PARAM_INT);
+		$sth->bindParam(2, $id_post, PDO::PARAM_INT);
+		$sth->execute();
+	}
+
+
+		function is_liked_post($id_user, $id_post){
+		// connect to db
+		try 
+		{
+			$host 	= 'localhost';
+			$dbname = 'social_networking';
+			$user 	= 'cicy';
+			$pass 	= 'cicy';
+		    $db = new PDO('mysql:host=' .$host. ';dbname=' .$dbname.';charset=utf8', $user, $pass);
+		} 
+		catch(PDOException $ex) 
+		{
+		    echo "Cannot establish connection to database!!!"; 
+		}
+		// get all posts
+		$stmt = $db->prepare("SELECT * FROM likes_post WHERE id_user=? AND id_post=?" );
+		$stmt->bindValue(1, $id_user, PDO::PARAM_INT);
+		$stmt->bindValue(2, $id_post, PDO::PARAM_INT);
+		$stmt->execute();
+		$rows = $stmt->fetchAll();
+		$nb_rows = count($rows);
+		if($nb_rows == 0)
+			return false;
+		else
+			return true;
+
+	}
+
+
+		function get_like_post($id_post){
+		// connect to db
+		try 
+		{
+			$host 	= 'localhost';
+			$dbname = 'social_networking';
+			$user 	= 'cicy';
+			$pass 	= 'cicy';
+		    $db = new PDO('mysql:host=' .$host. ';dbname=' .$dbname.';charset=utf8', $user, $pass);
+		} 
+		catch(PDOException $ex) 
+		{
+		    echo "Cannot establish connection to database!!!"; 
+		}
+		// get all posts
+		$stmt = $db->prepare("SELECT * FROM likes_post WHERE id_post=?");
+		$stmt->bindValue(1, $id_post, PDO::PARAM_INT);
+		$stmt->execute();
+		$rows = $stmt->fetchAll();
+		return count($rows);
 
 	}
 

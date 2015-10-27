@@ -46,7 +46,7 @@
 
   	}
 
-	do_html_header('Reset password',true, true, false);
+	do_html_header('Reset password',true, true, '', false);
 	do_html_reset_password($errPwd, $errPwd2, $result, $success);
 	do_html_footer();
 

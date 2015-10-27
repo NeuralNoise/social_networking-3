@@ -4,7 +4,7 @@
   session_start();
 
   if($_SESSION['user_id']){
-  	do_html_header('Comments',false,false,true);
+  	do_html_header('Comments',false,false, $_SESSION['username'], true);
     do_html_comments();
 
         if( isset($_POST['submit']) ){
@@ -30,7 +30,7 @@
   }
   else
   {
-  	do_html_header('Comments',true,true,false);
+  	do_html_header('Comments',true,true, '',false);
   	echo 'please login to see comments';
   }
 

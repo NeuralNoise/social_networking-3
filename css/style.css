@@ -1,5 +1,6 @@
 body {
   background-color: #eee;
+
 }
 .container {
 	margin-bottom: 80px;
@@ -20,4 +21,7 @@ body {
   margin-top: 40px; 
   margin-left: 50px;
   padding-top: 50px;
+}
+.blue {
+    color: #6cf;
 }

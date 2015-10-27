@@ -7,12 +7,13 @@
 	$logout 	= $_GET['logout'];
 	if($logout){
 		$_SESSION['user_id'] = '';
+		$_SESSION['username'] = '';
 		session_destroy();
 	}
 
 	if( ($_SESSION['user_id']) ){
 
-		do_html_header('Login',false, false, true);
+		do_html_header('Login',false, false, $_SESSION['username'], true);
 		echo 'You are already login';
 		do_html_footer();
 	} 
@@ -29,7 +30,11 @@
 			if($id){
 				// start session for id
 				$_SESSION['user_id'] = 	$id;
-				// redirect and pass name (Get)
+				// get username from db and add to session
+				$details  = user_details($id);
+				$_SESSION['username'] = $details['username'];
+
+				// redirect and pass user id using GET
 				header('Location: /profile.php?id='.$id);
 				die();
 			}
@@ -40,7 +45,7 @@
 
 	  	}
 
-		do_html_header('Login',false, true, false);
+		do_html_header('Login',false, true, '', false);
 		do_html_login($result);
 		do_html_footer();
 	}

@@ -31,6 +31,7 @@
         $result='<div class="alert alert-danger">Post cannot be empty</div>';
       }
     }
+
     // adding comment
     if( isset($_POST['submit_comment']) ){
 
@@ -45,22 +46,32 @@
 
       if(!$errComment){
         // add comment to db
-        echo 'adding comment to db';
         add_comment($id_user_current, $id_post, $comment);
       }
       else{
+         // call javascript popups window
          echo '<script type="text/javascript">    setTimeout(function() { emptyComment(); }, 500);      </script>';
       }
 
+
     }
 
-  	do_html_header('Home',false,false,true);
+    // adding like to post
+    if( isset($_GET['id_user']) && isset($_GET['id_post'])){
+      // add like to db
+      $id_user = $_GET['id_user'];
+      $id_post = $_GET['id_post'];
+      add_like_post($id_user, $id_post);
+    }
+
+
+  	do_html_header('Home',false,false, $_SESSION['username'], true);
     do_html_posts($id_user_current, $result);
   }
   else
   {
-   do_html_header('Home',true,true,false); 
-   echo 'please login to see your posts';	
+   do_html_header('Home',true,true, '', false); 
+   do_html_intro();
   }
 
   do_html_footer();

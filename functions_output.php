@@ -1,6 +1,6 @@
 <?php
 
-  function do_html_header($title, $login, $signup, $logout)
+  function do_html_header($title, $login, $signup, $username, $logout)
   {
   //print an HTML header
 ?>
@@ -38,28 +38,18 @@
 ?>
       <li class="active"><a href="#">Home</a></li>
       <li><a href="profile.php">Profile</a></li>
-      <li><a href="comments.php">Comments</a></li> 
 <?php
       break;
     case 'Profile':
 ?>
       <li><a href="index.php">Home</a></li>
       <li class="active"><a href="#">Profile</a></li>
-      <li><a href="comments.php">Comments</a></li> 
-<?php
-      break;
-    case 'Comments':
-?>
-      <li><a href="index.php">Home</a></li>
-      <li><a href="profile.php">Profile</a></li>
-      <li class="active"><a href="#">Comments</a></li>
 <?php
       break;
     default:
 ?>
       <li><a href="index.php">Home</a></li>
       <li><a href="profile.php">Profile</a></li>
-      <li><a href="comments.php">Comments</a></li> 
 <?php
       break;
   }
@@ -79,6 +69,8 @@
   }
   if($logout){
 ?>
+        <p class="navbar-text" style="margin-left: 15px;"><span class="glyphicon glyphicon-user"></span> <?php echo $username; ?></p>
+        <!-- <li><a href="sign_up.php"><span class="glyphicon glyphicon-user"></span> <?php echo $username; ?></a></li> -->
         <li><a href="login.php?logout=true"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
 <?php
   }
@@ -88,16 +80,29 @@
     </div>
   </div>
 </nav>
+
 <?php
   }
   //end of function "do_html_header()"/////////////////////////////////////
+
+     function do_html_intro(){
+    // fucntion allow adding new posts
+?>
+  <div class="container bg-img">
+    <h1>Welcome to Social Networking</h1>
+    <p>Please login in order to use this service!</p>
+  </div>
+
+<?php 
+  }
+    // end of do_html_posts
 
   function do_html_login($result)
   {
   // function creates login form
 ?>
 
-<div class="container">
+<div class="container bg-img">
   <h2>Login</h2>
   <form role="form" action="login.php" method="post">
     <div class="form-group">
@@ -200,7 +205,7 @@
     // get user details from db
     $details  = user_details($id);
 ?>
-  <div class="container">
+  <div class="container bg-img">
     <h2>User profile</h2>
 
 
@@ -255,26 +260,6 @@
 <?php
   }
   // end of user profile
-
-  function do_html_comments(){
-    // fucntion displays all comments
-?>
-  <div class="container">
-    <h2>Comments</h2>
-    <form role="form" action="comments.php" method="post">
-      <div class="form-group">
-        <label for="comment">Your comment:</label>
-        <input type="text" class="form-control" id="comment" name="comment" placeholder="Enter your comment here">
-      </div>
-      <div class="form-group">
-        <?php echo $result; ?> 
-      </div>
-      <button id="submit" name="submit" type="submit" class="btn btn-default">Add comment</button>
-    </form>
-  </div>
-<?php 
-  }
-    // end of comments
 
     function do_html_forgotten_password($errEmail, $result){
 ?>
@@ -337,7 +322,7 @@ if(!$success){
     // end of reset password
 
    function do_html_posts($id_user, $result){
-    // fucntion displays all comments
+    // fucntion allow adding new posts
 ?>
   <div class="container">
     <h2>Add post</h2>
@@ -355,7 +340,7 @@ if(!$success){
 <?php 
       do_html_published_posts($id_user);
   }
-    // end of comments
+    // end of do_html_posts
 
   function do_html_published_posts($id_user_current)
   {
@@ -367,7 +352,7 @@ if(!$success){
     <div class="panel-group">
 <?php 
 
-      // used to load a section position on the page 
+      // used in order to load a section position on the page 
       $counter      = 1;
 
       // get all posts from db
@@ -386,8 +371,11 @@ if(!$success){
         if($id_user_post == $id_user_current)
           $panel_type = 'success';
 
-        // echo 'id_user_post: ', $id_user_post, ' ';
-        // echo 'id_post: ', $id_post, ' ';
+        // get number of post likes
+        $nb_like_post = get_like_post($id_post);
+
+        // check if already liked
+        $is_liked_post = is_liked_post($id_user_current, $id_post);
 ?>
       <div id="section-<?php echo $counter; ?>" class="panel panel-<?php echo $panel_type; ?>">
         
@@ -398,12 +386,39 @@ if(!$success){
           </div>
         </div>
 
-                <div class="panel-body">
+        <nav class="navbar navbar-default">
+          <div class="container-fluid">
+            <div>
+              <ul class="nav navbar-nav navbar-right">
+<?php
+        if($is_liked_post)
+        {
+?>
+                <p class="navbar-text"><span class="glyphicon glyphicon-thumbs-up blue" style="margin-left: 15px;"></span><span class="blue"> Liked</span></p>
+<?php          
+        }else
+        {
+?>
+                <li><a href="?id_user=<?php echo $id_user_current; ?>&id_post=<?php echo $id_post; ?>#section-<?php echo $counter; ?>"><span class="glyphicon glyphicon-thumbs-up"></span> Like</a></li>
+<?php
+        }
+?>
+                
+                <p class="navbar-text" style="margin-left: 15px;">Likes: <?php echo $nb_like_post; ?></p>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class="panel-body">
           <h7><em>Comments:</em></h7>
 
 <?php
         // get all comments for individual post from db
         $comments = get_comments($id_post);
+
+        if(count($comments) == 0)
+          echo '<p>No comments yet!</p>';
         foreach ($comments as $line2) {
         
         // split array into variables
@@ -417,12 +432,8 @@ if(!$success){
             <div class="col-sm-10"><?php echo $comment; ?></div>
           </div>
 
-          <div class="row">
-            <div class="col-sm-2"></div>
-            <div class="col-sm-10"><b><em>likes:7</em></b></div>
-          </div>
 <?php
-          }
+        }
 
 ?>
           &nbsp;
@@ -430,7 +441,6 @@ if(!$success){
             <div class="form-group">
               <input type="text" class="form-control" id="comment<?php echo $counter; ?>" name="comment" placeholder="Enter your comment here">
             </div>
-            <?php echo "<p class='text-danger'>$errComment</p>";?>
             <input type="hidden" id="id_user_comment" name="id_post" value="<?php echo $id_post; ?>" /> 
             <button id="submit_comment" name="submit_comment" type="submit" class="btn btn-default">Add comment</button>
           </form>    
@@ -445,25 +455,7 @@ if(!$success){
   </div>
 
 <?php
-  }
-  //end of function "do_html_published posts"///////////////////////////////////////
 
-  function add_comment_form($id_user_comment, $id_post)
-  {
-  // function closes html code
-?>
-
-    &nbsp;
-    <form role="form" action="index.php?id_user_comment=<?php echo $id_user_comment; ?>&id_post=<?php echo $id_post; ?>" method="post">
-      <div class="form-group">
-        <input type="text" class="form-control" id="comment" name="comment" placeholder="Enter your comment here">
-      </div>
-      <?php echo "<p class='text-danger'>$errComment</p>";?>
-      <button id="comment" name="comment" type="submit" class="btn btn-default">Add comment</button>
-
-
-
-<?php
   }
   //end of function "do_html_footer"///////////////////////////////////////
 

@@ -78,7 +78,7 @@
 		}
 	}
 
-	do_html_header('Sign up',true, false, false);
+	do_html_header('Sign up',true, false, '', false);
 	do_html_sign_up($errLogin, $errName, $errSurname, $errAge, $errPhone, $errEmail, $errPwd, $errPwd2, $result, $login, $name, $surname, $age, $phone, $email);
 	do_html_footer();
 
